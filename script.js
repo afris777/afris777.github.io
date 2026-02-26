@@ -1,25 +1,13 @@
 const FEED_URL = "https://www.computerbase.de/autor/andreas-frischholz/index.atom";
-const CORS_PROXIES = [
-    (url) => "https://corsproxy.io/?" + encodeURIComponent(url),
-    (url) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
-];
 const MAX_ARTICLES = 10;
 
 async function loadFeed() {
     const container = document.getElementById("feed");
 
     try {
-        let text = null;
-        for (const proxy of CORS_PROXIES) {
-            try {
-                const response = await fetch(proxy(FEED_URL));
-                if (response.ok) {
-                    text = await response.text();
-                    break;
-                }
-            } catch (_) { /* try next proxy */ }
-        }
-        if (!text) throw new Error("Feed konnte nicht geladen werden.");
+        const response = await fetch(FEED_URL);
+        if (!response.ok) throw new Error("Feed konnte nicht geladen werden.");
+        const text = await response.text();
         const xml = new DOMParser().parseFromString(text, "application/xml");
         const entries = xml.querySelectorAll("entry");
 
